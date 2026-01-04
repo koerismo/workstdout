@@ -13,7 +13,7 @@ export class CourseConverter {
 	async parseFile(file: File) {
 		const result = await readCourseSheet(file);
 		this.setCourses(result.ok ? result.value : []);
-		if (!result.ok) this.errors = [result.value];
+		this.errors = result.ok ? [] : [result.value];
 		return result;
 	}
 
