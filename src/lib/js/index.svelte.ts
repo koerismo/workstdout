@@ -1,6 +1,7 @@
 import { VCalendar, VEvent, Timestamp, Timezone, WeeklyRepeat } from './core/ical.js';
 import { parseToEvent } from './core/eventparser.js';
 import { readCourseSheet, type CourseEntry } from './core/xlsx.js';
+import { toaster } from '$lib/js/toaster.js';
 
 import config from './config.json';
 
@@ -14,6 +15,8 @@ export class CourseConverter {
 		const result = await readCourseSheet(file);
 		this.setCourses(result.ok ? result.value : []);
 		this.errors = result.ok ? [] : [result.value];
+		for (const err of this.errors)
+			toaster.error({ description: err });
 		return result;
 	}
 
@@ -42,6 +45,8 @@ export class CourseConverter {
 
 		this.errors = errors;
 		if (errors.length) {
+			for (const err of errors)
+				toaster.error({ description: err });
 			this.output = undefined;
 			return false;
 		}

@@ -15,8 +15,8 @@ importers:
         specifier: ^9.39.2
         version: 9.39.2
       '@koerismo/result':
-        specifier: link:../result-js
-        version: link:../result-js
+        specifier: link:result-js
+        version: link:result-js
       '@lucide/svelte':
         specifier: ^0.562.0
         version: 0.562.0(svelte@5.46.1)

@@ -16,7 +16,7 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.4.1",
 		"@eslint/js": "^9.39.2",
-		"@koerismo/result": "link:../result-js",
+		"@koerismo/result": "link:result-js",
 		"@lucide/svelte": "^0.562.0",
 		"@skeletonlabs/skeleton": "^4.9.0",
 		"@skeletonlabs/skeleton-svelte": "^4.9.0",
