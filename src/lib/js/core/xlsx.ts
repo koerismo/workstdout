@@ -1,5 +1,8 @@
-import * as Excel from 'exceljs';
+// @ts-expect-error No types.
+import * as Excel from 'exceljs/dist/exceljs.bare.js';
 import { Ok, Err, type ResultType } from '@koerismo/result';
+
+import type { Workbook, Worksheet, CellValue } from 'exceljs';
 
 export interface CourseEntry {
 	startDate: Date;
@@ -19,7 +22,7 @@ function makeTimeFloat(d: Date): Date {
 	return d;
 }
 
-function getHeaderIndices(sheet: Excel.Worksheet, row: number): HeaderIndices | undefined {
+function getHeaderIndices(sheet: Worksheet, row: number): HeaderIndices | undefined {
 	const colCount = sheet.columnCount;
 	const indices: Partial<HeaderIndices> = {};
 
@@ -35,7 +38,7 @@ function getHeaderIndices(sheet: Excel.Worksheet, row: number): HeaderIndices | 
 
 export async function readCourseSheet(file: File): Promise<ResultType<CourseEntry[], string>> {
 	const buffer = await file.arrayBuffer();
-	const workbook = new Excel.Workbook();
+	const workbook: Workbook = new Excel.Workbook();
 
 	try {
 		await workbook.xlsx.load(buffer);
@@ -53,7 +56,7 @@ export async function readCourseSheet(file: File): Promise<ResultType<CourseEntr
 	if (!headerIndices) return Err('Could not identify spreadsheet headers!');
 
 	let row: number;
-	const get = <T extends Excel.CellValue>(key: ValidHeader) => sheet.getCell(row, headerIndices[key]).value as T;
+	const get = <T extends CellValue>(key: ValidHeader) => sheet.getCell(row, headerIndices[key]).value as T;
 
 	const out: CourseEntry[] = [];
 	for (row=headerRow+1; row<=sheet.rowCount; row++) {
