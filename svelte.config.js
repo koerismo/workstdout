@@ -10,7 +10,10 @@ const config = {
 		modernAst: true,
 	},
 
-	kit: { adapter: adapter() }
+	kit: {
+		adapter: adapter({ pages: 'dist' }),
+		paths: { relative: true },
+	},
 };
 
 export default config;
