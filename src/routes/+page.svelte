@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { GithubIcon, LoaderCircleIcon } from '@lucide/svelte';
 	import { AppBar } from '@skeletonlabs/skeleton-svelte';
-
+	import WarnTooltip from '$lib/components/WarnTooltip.svelte';
+	
 	import { CourseConverter } from '$lib/js/index.svelte.js';
 	import type { CourseEntry } from '$lib/js/core/xlsx.js';
 	import { toaster } from '$lib/js/toaster.js';
@@ -22,7 +23,13 @@
 		const fmtd = (d: Date) => d.toLocaleDateString('en-us', { year: '2-digit', month: '2-digit', day: '2-digit' });
 		
 		for (const course of converter.courses) {
-			const title = fmtd(course.entry.startDate) + ' to ' + fmtd(course.entry.endDate);
+			let title: string;
+			if (course.entry.startDate && course.entry.endDate) {
+				title = fmtd(course.entry.startDate) + ' to ' + fmtd(course.entry.endDate);
+			}
+			else {
+				title = 'Unknown';
+			}
 			mapped[title] ??= { start: course.entry.startDate, courses: [] };
 			mapped[title].courses.push(course);
 		}
@@ -32,6 +39,10 @@
 			.map(([k, v]) => ({ title: k, courses: v.courses }));
 	});
 
+	function entryWarning(entry: CourseEntry) {
+		return (entry.endDate == null || entry.startDate == null || !entry.meetPatterns);
+	}
+
 	async function onFile() {
 		if (!input.files?.length) return;
 		await converter.parseFile(input.files[0]);
@@ -39,9 +50,17 @@
 
 	function download() {
 		if (busy) return;
-		const ok = converter.generateOutput();
-		
 		busy = true;
+
+		let ok = false;
+		try {
+			ok = converter.generateOutput();
+		}
+		catch (e) {
+			toaster.error({ description: String(e) });
+			console.error(e);
+		}
+		
 		setTimeout(() => {
 			busy = false;
 			if (ok) converter.downloadOutput();
@@ -91,12 +110,17 @@
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
-						class="p-1.5 flex flex-row gap-3 place-items-center rounded-sm cursor-pointer"
+						class="p-1.5 py-1 flex flex-row gap-3 place-items-center rounded-sm cursor-pointer"
 						class:kd-active={course.enabled}
 						onclick={() => course.enabled = !course.enabled}
 						>
 							<input type="checkbox" class="checkbox" bind:checked={course.enabled} />
-							<span class="select-none" class:opacity-30={!course.enabled}>{course.entry.section}</span>
+							<span class="select-none grow" class:opacity-30={!course.enabled}>{course.entry.section}</span>
+							{#if entryWarning(course.entry)}
+							<span>
+								<WarnTooltip />
+							</span>
+							{/if}
 					</div>
 				{/each}
 			{/each}

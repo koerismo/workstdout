@@ -14,7 +14,8 @@ type ValidHeader = 'start date' | 'end date' | 'instructor' | 'meeting patterns'
 const ValidHeaders = ['start date', 'end date', 'instructor', 'meeting patterns', 'section'] as const;
 
 /** Offsets the provided Date's local time to equal its UTC time. */
-function makeTimeFloat(d: Date): Date {
+function makeTimeFloat<T extends Date | undefined>(d: T): T {
+	if (!d) return d;
 	d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
 	return d;
 }

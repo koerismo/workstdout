@@ -1,4 +1,5 @@
-function escapeText(t: string) {
+function escapeText(t: string): string {
+	if (typeof t !== 'string') t = String(t);
 	return t.replace(/[,\n]/g, c => '\\' + c);
 }
 
