@@ -1,8 +1,5 @@
-// @ts-expect-error No types.
-import * as Excel from 'exceljs/dist/exceljs.bare.js';
+import { read as readXLSX, type WorkSheet, type WorkBook, utils, type CellObject, type CellAddress } from 'xlsx';
 import { Ok, Err, type ResultType } from '@koerismo/result';
-
-import type { Workbook, Worksheet, CellValue } from 'exceljs';
 
 export interface CourseEntry {
 	startDate: Date;
@@ -22,44 +19,72 @@ function makeTimeFloat(d: Date): Date {
 	return d;
 }
 
-function getHeaderIndices(sheet: Worksheet, row: number): HeaderIndices | undefined {
-	const colCount = sheet.columnCount;
+function getSheetMaxs(sheet: WorkSheet): { r: number; c: number; } {
+	let rowCount = 0;
+	let colCount = 0;
+	const keys = Object.keys(sheet);
+	
+	for (let i=0; i<keys.length; i++) {
+		const key = keys[i];
+		if (key[0] === '!') continue;
+
+		const { c, r } = utils.decode_cell(key);
+		if (c > colCount) colCount = c;
+		if (r > rowCount) rowCount = r;
+	}
+
+	return { c: colCount, r: rowCount };
+}
+
+function getHeaderIndices(sheet: WorkSheet, colCount: number, r: number): HeaderIndices | undefined {
 	const indices: Partial<HeaderIndices> = {};
 
-	for (let i=1; i<=colCount; i++) {
-		const cellText = sheet.getCell(row, i).text.toLowerCase();
+	for (let c=0; c<colCount; c++) {
+		let cellText: CellObject['v'] = sheet[utils.encode_cell({ r, c })]?.v;
+		if (typeof cellText !== 'string') continue;
+
+		cellText = cellText.toLowerCase();
 		if (!ValidHeaders.includes(cellText as ValidHeader)) continue;
-		indices[cellText as ValidHeader] = i;
+		indices[cellText as ValidHeader] = c;
 	}
 
 	if (Object.keys(indices).length < 5) return;
 	return indices as HeaderIndices;
-} 
+}
 
 export async function readCourseSheet(file: File): Promise<ResultType<CourseEntry[], string>> {
 	const buffer = await file.arrayBuffer();
-	const workbook: Workbook = new Excel.Workbook();
-
+	let workbook: WorkBook;
 	try {
-		await workbook.xlsx.load(buffer);
+		workbook = readXLSX(buffer, { cellHTML: false, cellFormula: false, cellText: false, cellDates: true });
 	}
 	catch (e) {
 		console.error(e);
 		return Err(String(e));
 	}
 
-	const sheet = workbook.getWorksheet(1);
+	const sheet = workbook.Sheets[workbook.SheetNames[0]];
 	if (!sheet) return Err('Provided spreadsheet is empty!');
 
-	const headerRow = 3;
-	const headerIndices = getHeaderIndices(sheet, headerRow);
+	const sheetMaxs = getSheetMaxs(sheet);
+	const colCount = sheetMaxs.c + 1;
+	const rowCount = sheetMaxs.r + 1;
+
+	const headerRow = 2;
+	const headerIndices = getHeaderIndices(sheet, colCount, headerRow);
 	if (!headerIndices) return Err('Could not identify spreadsheet headers!');
 
 	let row: number;
-	const get = <T extends CellValue>(key: ValidHeader) => sheet.getCell(row, headerIndices[key]).value as T;
+	const get = <T>(key: ValidHeader) => {
+		return (
+			sheet[
+				utils.encode_cell({ r: row, c: headerIndices[key] })
+			] as CellObject
+		)?.v as T;
+	}
 
 	const out: CourseEntry[] = [];
-	for (row=headerRow+1; row<=sheet.rowCount; row++) {
+	for (row=headerRow+1; row<rowCount; row++) {
 		out.push({
 			startDate: makeTimeFloat(get<Date>('start date')),
 			endDate: makeTimeFloat(get<Date>('end date')),

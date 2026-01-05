@@ -17,7 +17,7 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.4.1",
 		"@eslint/js": "^9.39.2",
-		"@koerismo/result": "link:result-js",
+		"@koerismo/result": "link:src/ext/result-js",
 		"@lucide/svelte": "^0.562.0",
 		"@skeletonlabs/skeleton": "^4.9.0",
 		"@skeletonlabs/skeleton-svelte": "^4.9.0",
@@ -30,7 +30,6 @@
 		"eslint": "^9.39.2",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.13.1",
-		"exceljs": "^4.4.0",
 		"globals": "^16.5.0",
 		"prettier": "^3.7.4",
 		"prettier-plugin-svelte": "^3.4.1",

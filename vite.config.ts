@@ -5,7 +5,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 
 
 
-export default defineConfig((env) => ({
+export default defineConfig(() => ({
 	plugins: [
 		tailwindcss(),
 		sveltekit(),
@@ -13,4 +13,5 @@ export default defineConfig((env) => ({
 			? visualizer({ emitFile: true, filename: 'stats.html' })
 			: undefined,
 	],
+	build: { sourcemap: true }
 }));
