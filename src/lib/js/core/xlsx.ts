@@ -20,21 +20,24 @@ function makeTimeFloat<T extends Date | undefined>(d: T): T {
 	return d;
 }
 
-function getSheetMaxs(sheet: WorkSheet): { r: number; c: number; } {
-	let rowCount = 0;
-	let colCount = 0;
+function getSheetSize(sheet: WorkSheet): { r: number; c: number; } {
+	let rowMax = 0;
+	let colMax = 0;
+	let hasCell = false;
 	const keys = Object.keys(sheet);
 	
 	for (let i=0; i<keys.length; i++) {
 		const key = keys[i];
 		if (key[0] === '!') continue;
+		hasCell = true;
 
 		const { c, r } = utils.decode_cell(key);
-		if (c > colCount) colCount = c;
-		if (r > rowCount) rowCount = r;
+		if (c > colMax) colMax = c;
+		if (r > rowMax) rowMax = r;
 	}
 
-	return { c: colCount, r: rowCount };
+	if (!hasCell) return { c: 0, r: 0 };
+	return { c: colMax + 1, r: rowMax + 1 };
 }
 
 function getHeaderIndices(sheet: WorkSheet, colCount: number, r: number): HeaderIndices | undefined {
@@ -67,9 +70,8 @@ export async function readCourseSheet(file: File): Promise<ResultType<CourseEntr
 	const sheet = workbook.Sheets[workbook.SheetNames[0]];
 	if (!sheet) return Err('Provided spreadsheet is empty!');
 
-	const sheetMaxs = getSheetMaxs(sheet);
-	const colCount = sheetMaxs.c + 1;
-	const rowCount = sheetMaxs.r + 1;
+	const { c: colCount, r: rowCount } = getSheetSize(sheet);
+	if (!(colCount && rowCount)) return Err('Provided spreadsheet is empty!');
 
 	const headerRow = 2;
 	const headerIndices = getHeaderIndices(sheet, colCount, headerRow);
@@ -90,7 +92,7 @@ export async function readCourseSheet(file: File): Promise<ResultType<CourseEntr
 			startDate: makeTimeFloat(get<Date>('start date')),
 			endDate: makeTimeFloat(get<Date>('end date')),
 			section: get<string>('section'),
-			instructor: get<string>('instructor'),
+			instructor: get<string>('instructor') ?? 'Unassigned',
 			meetPatterns: get<string>('meeting patterns'),
 		});
 	}

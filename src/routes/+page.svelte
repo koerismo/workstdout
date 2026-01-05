@@ -2,7 +2,7 @@
 	import { GithubIcon, LoaderCircleIcon } from '@lucide/svelte';
 	import { AppBar } from '@skeletonlabs/skeleton-svelte';
 	import WarnTooltip from '$lib/components/WarnTooltip.svelte';
-	
+
 	import { CourseConverter } from '$lib/js/index.svelte.js';
 	import type { CourseEntry } from '$lib/js/core/xlsx.js';
 	import { toaster } from '$lib/js/toaster.js';
