@@ -8,6 +8,10 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({ pages: 'dist' }),
+		paths: { // todd howard please fix
+			relative: true,
+			base: '/workstdout',
+		},
 	},
 };
 
