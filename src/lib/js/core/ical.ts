@@ -7,10 +7,6 @@ function formatInt(t: number, len: number=2): string {
 	return t.toString().padStart(len, '0');
 }
 
-// function mod(n: number, d: number): number {
-// 	return ((n % d) + d) % d;
-// }
-
 export const enum Timezone {
 	Invalid = -1,
 	Floating,

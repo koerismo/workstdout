@@ -9,9 +9,9 @@ export interface CourseEntry {
 	meetPatterns: string;
 }
 
-type HeaderIndices = {[key: string]: number};
-type ValidHeader = 'start date' | 'end date' | 'instructor' | 'meeting patterns' | 'section';
 const ValidHeaders = ['start date', 'end date', 'instructor', 'meeting patterns', 'section'] as const;
+type ValidHeader = typeof ValidHeaders[number];
+type HeaderIndices = Record<ValidHeader, number>;
 
 /** Offsets the provided Date's local time to equal its UTC time. */
 function makeTimeFloat<T extends Date | undefined>(d: T): T {
@@ -44,12 +44,12 @@ function getHeaderIndices(sheet: WorkSheet, colCount: number, r: number): Header
 	const indices: Partial<HeaderIndices> = {};
 
 	for (let c=0; c<colCount; c++) {
-		let cellText: CellObject['v'] = sheet[utils.encode_cell({ r, c })]?.v;
+		const cellText: CellObject['v'] = sheet[utils.encode_cell({ r, c })]?.v;
 		if (typeof cellText !== 'string') continue;
 
-		cellText = cellText.toLowerCase();
-		if (!ValidHeaders.includes(cellText as ValidHeader)) continue;
-		indices[cellText as ValidHeader] = c;
+		const cellTextKey = cellText.toLowerCase() as ValidHeader;
+		if (!ValidHeaders.includes(cellTextKey)) continue;
+		indices[cellTextKey] = c;
 	}
 
 	if (Object.keys(indices).length < 5) return;

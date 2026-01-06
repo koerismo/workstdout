@@ -1,13 +1,3 @@
-/*
-
-M-R | 12:00 PM - 1:50 PM | Fuller Labs 222 IMGD Computer Lab
-M-R | 2:00 PM - 3:50 PM | Atwater Kent 013 Computer Lab
-F | 12:00 PM - 1:50 PM | Alden Hall B30 Music Technology Lab
-T-F | 10:00 AM - 11:50 AM | Higgins Labs 154
-T-F | 12:00 PM - 1:50 PM | Fuller Labs 222 IMGD Computer Lab
-M-T-R-F | 3:00 PM - 3:50 PM | Fuller Labs PHL Perreault Hall - Lower Section
-*/
-
 import { Err, Ok, type ResultType } from '@koerismo/result';
 import { Timestamp, Timezone, VEvent, WeeklyRepeat, type WeekdayString } from './ical.js';
 

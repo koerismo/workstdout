@@ -1,4 +1,4 @@
-import { VCalendar, VEvent, Timestamp, Timezone, WeeklyRepeat } from './core/ical.js';
+import { VCalendar, VEvent } from './core/ical.js';
 import { parseToEvent } from './core/eventparser.js';
 import { readCourseSheet, type CourseEntry } from './core/xlsx.js';
 import { toaster } from '$lib/js/toaster.js';
