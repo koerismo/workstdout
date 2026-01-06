@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { GithubIcon, LoaderCircleIcon } from '@lucide/svelte';
-	import { AppBar } from '@skeletonlabs/skeleton-svelte';
+	import { LoaderCircleIcon } from '@lucide/svelte';
 	import WarnTooltip from '$lib/components/WarnTooltip.svelte';
 
 	import { CourseConverter } from '$lib/js/index.svelte.js';
 	import type { CourseEntry } from '$lib/js/core/xlsx.js';
 	import { toaster } from '$lib/js/toaster.js';
+	import { resolve } from '$app/paths';
 
 	const converter = new CourseConverter();
 	let busy = $state(false);
@@ -21,13 +21,12 @@
 	const sortedCourses = $derived.by(() => {
 		const mapped: Record<string, { start: Date, courses: { entry: CourseEntry, enabled: boolean }[]}> = {};
 		const fmtd = (d: Date) => d.toLocaleDateString('en-us', { year: '2-digit', month: '2-digit', day: '2-digit' });
-		
+
 		for (const course of converter.courses) {
 			let title: string;
 			if (course.entry.startDate && course.entry.endDate) {
 				title = fmtd(course.entry.startDate) + ' to ' + fmtd(course.entry.endDate);
-			}
-			else {
+			} else {
 				title = 'Unknown';
 			}
 			mapped[title] ??= { start: course.entry.startDate, courses: [] };
@@ -60,11 +59,11 @@
 			toaster.error({ description: String(e) });
 			console.error(e);
 		}
-		
+
 		setTimeout(() => {
 			busy = false;
 			if (ok) converter.downloadOutput();
-		}, 400);
+		}, 350);
 	}
 
 	function clearFile() {
@@ -75,37 +74,18 @@
 	}
 </script>
 
-<AppBar>
-	<AppBar.Toolbar class="grid-cols-[1fr_auto] w-full lg:w-4xl mx-auto">
-		<AppBar.Headline>
-			<a class="btn hover:preset-tonal" href="/">WorkStdout</a>
-		</AppBar.Headline>
-		<AppBar.Trail class="flex flex-row place-items-center">
-			<a type="button" class="btn-icon hover:preset-tonal" href="https://github.com/koerismo/workstdout" rel="external noreferrer" referrerpolicy="no-referrer">
-				<GithubIcon class="size-6" />
-			</a>
-		</AppBar.Trail>
-	</AppBar.Toolbar>
-</AppBar>
+<main class="flex flex-col w-page gap-3 my-8">
+	<h2 class="h2 mb-2">Workday Calendar Generator</h2>
 
-<main class="flex flex-col w-auto mx-2 lg:w-4xl lg:mx-auto gap-3 my-8">
 	<div class="flex gap-3">
-		<input class="input" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple={false} bind:this={input} oninput={onFile} />
-		<button class="btn preset-filled-surface-900-100" onclick={clearFile} disabled={!(converter.courses.length || converter.errors.length)}>Clear</button>
+		<input class="input cursor-pointer" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple={false} bind:this={input} oninput={onFile} />
+		<button class="btn preset-outlined-surface-900-100" onclick={clearFile} disabled={!(converter.courses.length || converter.errors.length)}>Clear</button>
 	</div>
-
-	<!-- {#if converter.errors.length}
-	<div class="flex flex-col gap-2">
-		{#each converter.errors as err}
-		<p class="block bg-error-50-950 text-error-950-50 rounded-sm py-2 px-3 text-xs" >{ err }</p>
-		{/each}
-	</div>
-	{/if} -->
 
 	<div class="border border-surface-200-800 flex flex-col rounded-sm p-1.5">
 		{#if converter.courses.length}
 			{#each sortedCourses as { title, courses }}
-				<p class="text-xs font-bold px-1.5 pt-1.5 text-secondary-500">{ title }</p>
+				<p class="text-xs font-bold px-1.5 pt-2 text-surface-300-700">{ title }</p>
 				{#each courses as course}
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -125,13 +105,16 @@
 				{/each}
 			{/each}
 		{:else}
-			<i class="text-sm text-neutral-500 py-20 mx-auto">Upload a file to get started.</i>
+			<div class="py-20 mx-auto text-sm">
+				<i class="text-neutral-500">Upload a file to get started.</i> 
+				<a class="text-primary-500 underline" href={resolve('/help/')}>How?</a>
+			</div>
 		{/if}
 	</div>
 	
 	<div class="grid grid-cols-[auto_1fr] gap-3">
 		<span class="place-self-center">{ courseCount } section{ courseCount !== 1 ? 's' : '' } included</span>
-		<button onclick={download} class="btn preset-filled-primary-500" disabled={busy || !converter.readyToGenerate || !courseCount}>
+		<button onclick={download} class="btn preset-filled-primary-500 dark:text-surface-950" disabled={busy || !converter.readyToGenerate || !courseCount}>
 			{#if busy}
 				<LoaderCircleIcon class="size-4 kd-spin" strokeWidth="2.5" />
 			{/if}

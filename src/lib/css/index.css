@@ -15,3 +15,18 @@ body {
 	flex-direction: column;
 	min-height: 100svh;
 }
+
+.checkbox {
+	--tw-ring-offset-color: var(--color-surface-50-950);
+}
+
+.w-page {
+	@apply mx-4 w-auto;
+	@media (width > 64rem) {
+		@apply w-4xl mx-auto;
+	}
+}
+
+.text-base-all {
+	@apply text-base base-letter-spacing base-font-style base-font-weight;
+}

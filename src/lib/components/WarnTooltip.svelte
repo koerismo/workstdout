@@ -3,7 +3,7 @@
 	import { Portal, Tooltip, useTooltip } from '@skeletonlabs/skeleton-svelte';
 
 	const id = $props.id();
-	const tooltip = useTooltip({ id, positioning: { placement: 'bottom-end' } });
+	const tooltip = useTooltip({ id, positioning: { placement: 'bottom-end', offset: { mainAxis: 12 } } });
 </script>
 
 <div class="grid gap-4">
