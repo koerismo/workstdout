@@ -28,5 +28,5 @@ body {
 }
 
 .text-base-all {
-	@apply text-base base-letter-spacing base-font-style base-font-weight;
+	@apply text-base base-letter-spacing base-font-style base-font-weight base-font-family;
 }
