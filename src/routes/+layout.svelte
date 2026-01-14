@@ -9,6 +9,7 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 	<title>WorkStdout</title>
+	<meta name="title" property="og:title" content="Workday Calendar Generator" />
 </svelte:head>
 
 <Nav></Nav>
