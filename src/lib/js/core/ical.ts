@@ -1,6 +1,11 @@
+const escapeMap: Record<string, string> = {
+	'\n': '\\n',
+	',': '\\,',
+};
+
 function escapeText(t: string): string {
 	if (typeof t !== 'string') t = String(t);
-	return t.replace(/[,\n]/g, c => '\\' + c);
+	return t.replace(/[,\n]/g, c => escapeMap[c]);
 }
 
 function formatInt(t: number, len: number=2): string {
